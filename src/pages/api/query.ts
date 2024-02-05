@@ -1,8 +1,8 @@
-import { Recipe } from '@/shared.types';
+import { RecipeModel } from '@/shared.types';
 import { sql } from '@vercel/postgres';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-type ResponseData = Array<Recipe>
+type ResponseData = Array<RecipeModel>
 
 const queryDb = async (
   req: NextApiRequest,

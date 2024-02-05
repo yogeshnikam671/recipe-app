@@ -4,7 +4,8 @@ enum RecipeType {
   'NON_VEG'
 }
 
-export type Recipe = {
+// prefix all db representations with Model
+export type RecipeModel = {
   id: string,
   created_at: Date,
   name: string,
