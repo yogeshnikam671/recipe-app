@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { RecipeModel } from "@/shared.types";
 import { sql } from "@vercel/postgres";
+import { recipePerPage } from "@/constants/api";
 
 type ResponseData = Array<RecipeModel>
 
@@ -11,11 +12,11 @@ const fetchRecipees = async (
   const reqFields = req.query.fields as string | undefined;
   const page = (req.query.page != undefined ? req.query.page : 1) as number;
   const fields = reqFields != undefined ? reqFields : '*';
-
+  
   const query = `
     SELECT ${fields} FROM recipe 
     ORDER BY id
-    LIMIT 5 OFFSET ${5 * (page-1)}
+    LIMIT ${recipePerPage} OFFSET ${recipePerPage * (page-1)}
   `;
   const { rows } = await sql.query(query);
 

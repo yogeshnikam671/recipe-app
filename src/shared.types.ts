@@ -1,7 +1,7 @@
 
-enum RecipeType {
-  'VEG',
-  'NON_VEG'
+export enum RecipeType {
+  VEG = 'VEG',
+  NON_VEG = 'NON_VEG'
 }
 
 // prefix all db representations with Model
