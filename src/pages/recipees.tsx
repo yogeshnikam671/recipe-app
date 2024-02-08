@@ -1,9 +1,10 @@
 import { BFF_BASE_URL, recipePerPage } from "@/constants/api";
 import { recipeTypes } from "@/constants/recipe";
-import { RecipeModel } from "@/shared.types";
+import { RecipeModel, TextInputRef } from "@/shared.types";
 import axios from "axios";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
+import { useRef } from "react";
 
 type RecipeesProps = {
   recipees: Array<RecipeModel>,
@@ -18,20 +19,41 @@ const Recipees = ({
 }: RecipeesProps) => {
   
   const router = useRouter();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchedRecipe = searchInputRef.current?.value || '';
 
   const goToPrev = () => {
-    router.push(`/recipees?page=${page-1}`)
+    router.push(`/recipees?page=${page-1}&name=${searchedRecipe}`)
   }
 
   const goToNext = () => {
-    router.push(`/recipees?page=${page + 1}`)
+    router.push(`/recipees?page=${page + 1}&name=${searchedRecipe}`)
   }
 
+  const onSearchRecipe = async () => {
+    router.push(`/recipees?page=${page}&name=${searchedRecipe}`);
+  }
+  
   const noOfPages = Math.ceil(totalRecipees/recipePerPage);
-
+  // TODO - the table can be extracted into a separate component 
+  // to which we can pass the recipees list, that component will be very simple one.
   return (
     <>
       <div className="border border-black p-10">
+        <div className="border border-black p-5">
+          <input
+            className="border-none p-2 font-mono"
+            type="text"
+            ref={searchInputRef}
+            placeholder="Enter recipe name"
+          />
+          <button
+            className="border-none bg-red-50 ml-2"
+            onClick={onSearchRecipe}
+          >
+            search
+          </button>
+        </div>
         <table>
           <thead>
             <tr>
@@ -76,12 +98,14 @@ export default Recipees;
 // getServerSideProps runs every time a page is requested.
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const page = +(context?.query?.page || 1);
+  const searchByName = context?.query?.name || '';
+  
   const recipeesResponse = await axios.get(
-    `${BFF_BASE_URL}/recipees?fields=type,name,category&page=${page}`
+    `${BFF_BASE_URL}/recipees?fields=type,name,category&page=${page}&name=${searchByName}`
   );
 
   const totalRecipeesResponse = await axios.get(
-    `${BFF_BASE_URL}/recipe/count`
+    `${BFF_BASE_URL}/recipe/count?name=${searchByName}`
   );
 
   const recipees = recipeesResponse.data;

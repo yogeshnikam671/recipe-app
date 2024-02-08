@@ -13,3 +13,5 @@ export type RecipeModel = {
   category: string,
   description: string
 }
+
+export type TextInputRef = React.RefObject<HTMLInputElement>;
