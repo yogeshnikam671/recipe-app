@@ -1,9 +1,9 @@
 import { BFF_BASE_URL, recipePerPage } from "@/constants/api";
 import { recipeTypes } from "@/constants/recipe";
-import { RecipeModel, TextInputRef } from "@/shared.types";
+import { RecipeModel } from "@/shared.types";
 import axios from "axios";
 import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
+import Link from "next/link";
 import { useRef } from "react";
 
 type RecipeesProps = {
@@ -18,20 +18,16 @@ const Recipees = ({
   totalRecipees
 }: RecipeesProps) => {
   
-  const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchedRecipe = searchInputRef.current?.value || '';
 
-  const goToPrev = () => {
-    router.push(`/recipees?page=${page-1}&name=${searchedRecipe}`)
-  }
-
-  const goToNext = () => {
-    router.push(`/recipees?page=${page + 1}&name=${searchedRecipe}`)
-  }
-
-  const onSearchRecipe = async () => {
-    router.push(`/recipees?page=${page}&name=${searchedRecipe}`);
+  const getRecipeesLinkWith = ({
+    pageNumber,
+    recipeName
+  }: { pageNumber: number, recipeName: string }) => {
+    let link = `/recipees?page=${pageNumber}`;
+    if (recipeName) link += `&name=${recipeName}`;
+    return link;
   }
   
   const noOfPages = Math.ceil(totalRecipees/recipePerPage);
@@ -49,10 +45,12 @@ const Recipees = ({
           />
           <button
             className="border-none bg-red-50 ml-2"
-            onClick={onSearchRecipe}
           >
-            search
+            <Link href={getRecipeesLinkWith({ pageNumber: 1, recipeName: searchedRecipe })}>
+              search
+            </Link>
           </button>
+
         </div>
         <table>
           <thead>
@@ -75,15 +73,15 @@ const Recipees = ({
         <br/>
         <div className="p-2 flex justify-evenly">
           {page > 1 &&
-            <button onClick={goToPrev}>
+            <Link href={getRecipeesLinkWith({ pageNumber: page-1, recipeName: searchedRecipe })}>
               Prev
-            </button>
+            </Link>
           }
           <p>{page}</p>
           {page < noOfPages &&
-            <button onClick={goToNext}>
+            <Link href={getRecipeesLinkWith({ pageNumber: page+1, recipeName: searchedRecipe })}>
               Next
-            </button>
+            </Link>
           }
         </div>
       </div>

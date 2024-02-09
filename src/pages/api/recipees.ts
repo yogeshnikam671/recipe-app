@@ -11,10 +11,10 @@ const fetchRecipees = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const reqFields = req.query.fields as string | undefined;
+  const fields = reqFields != undefined ? reqFields : '*';
   
   const page = (req.query.page ? req.query.page : 1) as number;
   const name = req.query?.name as string || '';
-  const fields = reqFields != undefined ? reqFields : '*';
 
   const likeQuery = createLikeQueryForRecipeName(name);
 
