@@ -4,6 +4,7 @@ import { RecipeModel } from "@/shared.types";
 import axios from "axios";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 type RecipeesProps = {
@@ -20,6 +21,7 @@ const Recipees = ({
   searchedRecipeName
 }: RecipeesProps) => {
   
+  const router = useRouter();
   const [searchedRecipe, setSearchedRecipe] = useState(searchedRecipeName);
 
   const getRecipeesLinkWith = ({
@@ -29,6 +31,10 @@ const Recipees = ({
     let link = `/recipees?page=${pageNumber}`;
     if (recipeName) link += `&name=${recipeName}`;
     return link;
+  }
+
+  const redirectToRecipeDesc = (recipeName: string) => {
+    router.push(`/recipe/${recipeName}`);
   }
   
   const noOfPages = Math.ceil(totalRecipees/recipePerPage);
@@ -53,7 +59,8 @@ const Recipees = ({
           </button>
 
         </div>
-        <table>
+        <br/>
+        <table className="text-left">
           <thead>
             <tr>
               <th>Name</th>
@@ -63,10 +70,21 @@ const Recipees = ({
           </thead>
           <tbody>
             {recipees.map(recipe =>
-              <tr key={recipe.id}>
-                <td key={recipe.id}>{recipe.name}</td>
-                <td key={recipe.id}>{recipeTypes[recipe.type]}</td>
-                <td key={recipe.id}>{recipe.category}</td>
+              <tr
+                key={recipe.id}
+                onClick={() => redirectToRecipeDesc(recipe.name)}
+                className="cursor-pointer hover:bg-gray-100"
+                tabIndex={0}
+              >
+                <td className="p-1">
+                  {recipe.name}
+                </td>
+                <td className="p-1">
+                  {recipeTypes[recipe.type]}
+                </td>
+                <td className="p-1">
+                  {recipe.category}
+                </td>
               </tr>
             )}
           </tbody>
