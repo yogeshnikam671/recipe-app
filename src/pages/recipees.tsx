@@ -4,22 +4,23 @@ import { RecipeModel } from "@/shared.types";
 import axios from "axios";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
-import { useRef } from "react";
+import { useState } from "react";
 
 type RecipeesProps = {
   recipees: Array<RecipeModel>,
   page: number,
-  totalRecipees: number
+  totalRecipees: number,
+  searchedRecipeName: string
 }
 
 const Recipees = ({
   recipees,
   page,
-  totalRecipees
+  totalRecipees,
+  searchedRecipeName
 }: RecipeesProps) => {
   
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchedRecipe = searchInputRef.current?.value || '';
+  const [searchedRecipe, setSearchedRecipe] = useState(searchedRecipeName);
 
   const getRecipeesLinkWith = ({
     pageNumber,
@@ -40,8 +41,8 @@ const Recipees = ({
           <input
             className="border-none p-2 font-mono"
             type="text"
-            ref={searchInputRef}
             placeholder="Enter recipe name"
+            onChange={(e) => setSearchedRecipe(e.target.value)}
           />
           <button
             className="border-none bg-red-50 ml-2"
@@ -94,16 +95,18 @@ export default Recipees;
 // since we want to make an API call via BFF layer, we cannot really use getStaticProps here.
 // getStaticProps can only be used in a valid manner if some static data is being returned.
 // getServerSideProps runs every time a page is requested.
+// Bonus: Making BFF call from here involves unnecessary delay.
+// It is recommended to instead write the bff logic directly in this function.
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const page = +(context?.query?.page || 1);
-  const searchByName = context?.query?.name || '';
+  const searchByRecipeName = context?.query?.name || '';
   
   const recipeesResponse = await axios.get(
-    `${BFF_BASE_URL}/recipees?fields=type,name,category&page=${page}&name=${searchByName}`
+    `${BFF_BASE_URL}/recipees?fields=type,name,category&page=${page}&name=${searchByRecipeName}`
   );
 
   const totalRecipeesResponse = await axios.get(
-    `${BFF_BASE_URL}/recipe/count?name=${searchByName}`
+    `${BFF_BASE_URL}/recipe/count?name=${searchByRecipeName}`
   );
 
   const recipees = recipeesResponse.data;
@@ -112,9 +115,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
    props: {
     recipees,
     totalRecipees,
-    page
+    page,
+    searchedRecipeName: searchByRecipeName
    } 
   };
 }
-
-
