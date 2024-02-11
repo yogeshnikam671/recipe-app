@@ -3,6 +3,7 @@ import { fetchRecipeWithDesc } from "@/lib/fetchRecipeWithDesc";
 import { RecipeModel } from "@/shared.types";
 import { sql } from "@vercel/postgres";
 import { GetStaticPropsContext } from "next";
+import { useRouter } from "next/router";
 
 type RecipePropsType = {
   recipe: RecipeModel
@@ -11,6 +12,12 @@ type RecipePropsType = {
 const Recipe = ({
   recipe
 }: RecipePropsType) => {
+
+  const router = useRouter();
+
+  if (router.isFallback) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <>
@@ -37,7 +44,7 @@ export const getStaticPaths = async () => {
     }
   });
 
-  return { paths, fallback: 'blocking' };
+  return { paths, fallback: true };
 }
 
 export const getStaticProps = async (context: GetStaticPropsContext) => {
