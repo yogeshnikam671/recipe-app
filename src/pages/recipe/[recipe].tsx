@@ -64,6 +64,8 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
   return {
     props: {
       recipe: JSON.parse(JSON.stringify(recipe))
-    }
+    },
+    revalidate: 10 // will re-generate the static page once it is requested after 10 seconds post caching 
   }
 }
+// TODO - write an API route for manual revalidation of cached pages.
