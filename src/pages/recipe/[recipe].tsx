@@ -57,7 +57,8 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
       redirect: {
         destination: '/recipees',
         permanent: true
-      }
+      },
+      revalidate: 10 // If not added, the revalidation won't happen for redirected pages.
     };
   }
 
